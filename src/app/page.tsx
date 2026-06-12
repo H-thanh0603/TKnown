@@ -1,91 +1,131 @@
 import Link from "next/link";
 
+const USE_CASES = [
+  { emoji: "💻", title: "Code App", desc: "Mô tả ý tưởng → AI hỏi ngược → spec hoàn chỉnh cho Cursor" },
+  { emoji: "✍️", title: "Viết Content", desc: "Từ email, blog đến social — AI giúp bạn viết đúng ý ngay lần đầu" },
+  { emoji: "🎨", title: "Thiết Kế UI", desc: "Làm rõ phong cách, layout, mood trước khi vào Figma hay AI design" },
+  { emoji: "📊", title: "Chiến Lược KD", desc: "AI chất vấn kế hoạch của bạn như 1 cố vấn, giúp bạn nhìn ra góc khuất" },
+  { emoji: "📧", title: "Soạn Email", desc: "Không còn email lan man — AI hỏi đúng trọng tâm, bạn trả lời, email tự viết" },
+  { emoji: "📝", title: "Viết Tài Liệu", desc: "Từ README, proposal đến hướng dẫn — mọi thứ rõ ràng từ câu hỏi đầu tiên" },
+];
+
+const STEPS = [
+  { emoji: "💬", title: "Mô tả ý tưởng", desc: "1-2 câu bằng ngôn ngữ tự nhiên. Không cần prompt kỹ thuật." },
+  { emoji: "🎯", title: "AI chất vấn bạn", desc: "TKnown đặt 3-5 câu hỏi thông minh như 1 đồng nghiệp giàu kinh nghiệm." },
+  { emoji: "✨", title: "Nhận Brief hoàn chỉnh", desc: "Copy-paste cho Cursor, ChatGPT hay bất kỳ AI nào — code đúng ngay lần đầu." },
+];
+
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 gradient-bg-animated opacity-10" />
+    <main className="min-h-screen relative overflow-hidden">
+      {/* ============ HERO SECTION ============ */}
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 text-center">
+        {/* Decorative blur orbs */}
+        <div className="blur-orb blur-orb-indigo" style={{ top: "-10%", left: "-5%" }} />
+        <div className="blur-orb blur-orb-pink" style={{ top: "40%", right: "-8%" }} />
+        <div className="blur-orb blur-orb-amber" style={{ bottom: "10%", left: "20%" }} />
 
-      <div className="relative z-10 max-w-3xl mx-auto">
-        {/* Logo */}
-        <div className="mb-8">
-          <span className="text-5xl font-bold gradient-text">TKnown</span>
-        </div>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          {/* Badge */}
+          <div className="animate-fade-in mb-8">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-500/10 border border-violet-500/20 text-violet-300">
+              <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse-glow" />
+              AI Agent Era — Đừng để AI đoán ý bạn
+            </span>
+          </div>
 
-        {/* Tagline */}
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-          Đừng để AI <span className="gradient-text">đoán ý</span> bạn
-        </h1>
+          {/* Main heading */}
+          <h1 className="animate-fade-in-delay-1 text-5xl md:text-7xl font-extrabold mb-6 leading-[1.1] tracking-tight">
+            Bạn có ý tưởng.
+            <br />
+            <span className="gradient-text-warm">TKnown giúp bạn diễn đạt.</span>
+          </h1>
 
-        <p className="text-lg md:text-xl text-muted mb-4 max-w-xl mx-auto leading-relaxed">
-          TKnown giúp bạn làm rõ mọi yêu cầu — từ code, content, design đến chiến lược kinh doanh
-          — trước khi đưa cho AI thực thi.
-        </p>
+          <p className="animate-fade-in-delay-2 text-lg md:text-xl text-fg-muted mb-4 max-w-2xl mx-auto leading-relaxed">
+            Trước khi đưa cho AI code, viết, hay thiết kế — hãy để TKnown phỏng vấn bạn trước.
+            Như một đồng nghiệp thông minh, TKnown hỏi đúng câu hỏi để bạn có bản brief hoàn chỉnh.
+          </p>
 
-        <p className="text-sm text-muted/70 mb-10">
-          Không còn prompt 5-7 lần. Không còn AI "hiểu sai ý". Chỉ cần trả lời vài câu hỏi thông minh.
-        </p>
+          <p className="animate-fade-in-delay-2 text-sm text-fg-dim mb-10">
+            Không còn prompt đi prompt lại. Không còn AI "hiểu sai". Chỉ cần trả lời vài câu hỏi.
+          </p>
 
-        {/* CTA */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <Link
-            href="/new"
-            className="px-8 py-3.5 rounded-xl font-semibold text-white gradient-bg hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/25"
-          >
-            🚀 Tạo Brief Ngay
-          </Link>
-          <Link
-            href="/login"
-            className="px-8 py-3.5 rounded-xl font-semibold border border-card-border hover:bg-card/50 transition-colors"
-          >
-            Đăng nhập
-          </Link>
-        </div>
+          {/* CTA */}
+          <div className="animate-fade-in-delay-3 flex flex-col sm:flex-row gap-4 justify-center mb-20">
+            <Link href="/new" className="btn-primary text-lg px-10 py-4">
+              🚀 Tạo Brief Đầu Tiên — Miễn Phí
+            </Link>
+            <Link href="/login" className="btn-secondary text-lg px-10 py-4">
+              Đăng nhập
+            </Link>
+          </div>
 
-        {/* How it works */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-          {[
-            {
-              emoji: "💬",
-              title: "1. Mô tả ý tưởng",
-              desc: "Viết 1-2 câu về điều bạn muốn. Bằng ngôn ngữ tự nhiên của bạn.",
-            },
-            {
-              emoji: "🎯",
-              title: "2. AI phỏng vấn bạn",
-              desc: "TKnown đặt câu hỏi thông minh để làm rõ — như 1 đồng nghiệp giúp bạn nghĩ kỹ hơn.",
-            },
-            {
-              emoji: "📋",
-              title: "3. Nhận Brief hoàn chỉnh",
-              desc: "Bản spec rõ ràng, đầy đủ — copy-paste vào Cursor, ChatGPT hay bất kỳ AI tool nào.",
-            },
-          ].map((step) => (
-            <div key={step.title} className="glass-card p-5 hover:border-primary/30 transition-colors">
-              <div className="text-2xl mb-3">{step.emoji}</div>
-              <h3 className="font-semibold mb-1.5">{step.title}</h3>
-              <p className="text-sm text-muted">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Use cases */}
-        <div className="mt-16">
-          <p className="text-sm text-muted/60 mb-4">Dùng cho mọi tác vụ AI</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {["💻 Code App", "✍️ Viết Content", "🎨 Thiết Kế UI", "📊 Phân Tích KD", "📧 Soạn Email", "📝 Viết Docs"].map(
-              (tag) => (
-                <span key={tag} className="px-4 py-2 rounded-full text-sm bg-card border border-card-border text-muted">
-                  {tag}
-                </span>
-              )
-            )}
+          {/* How it works */}
+          <div className="animate-fade-in-delay-3 grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+            {STEPS.map((step, i) => (
+              <div key={i} className="glow-card p-6">
+                <div className="text-3xl mb-4">{step.emoji}</div>
+                <h3 className="font-semibold text-fg mb-2">{step.title}</h3>
+                <p className="text-sm text-fg-muted leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Footer */}
-        <p className="mt-20 text-xs text-muted/40">Built with ❤️ by Thanh · © 2026 TKnown</p>
-      </div>
+      {/* ============ USE CASES SECTION ============ */}
+      <section className="relative px-6 py-24">
+        <div className="blur-orb blur-orb-indigo" style={{ top: "20%", right: "-10%", opacity: 0.08 }} />
+
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Dùng cho <span className="gradient-text">mọi tác vụ AI</span>
+            </h2>
+            <p className="text-fg-muted text-lg max-w-xl mx-auto">
+              Từ code, content, design đến chiến lược — TKnown giúp bạn có brief rõ ràng trước khi bắt tay vào làm.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {USE_CASES.map((uc) => (
+              <div key={uc.title} className="glass-card p-6 group cursor-default">
+                <div className="text-2xl mb-3">{uc.emoji}</div>
+                <h3 className="font-semibold text-fg mb-1.5 group-hover:text-violet-400 transition-colors">
+                  {uc.title}
+                </h3>
+                <p className="text-sm text-fg-muted leading-relaxed">{uc.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ BOTTOM CTA ============ */}
+      <section className="px-6 py-24 text-center">
+        <div className="max-w-2xl mx-auto">
+          <div className="glass-card p-10 relative overflow-hidden">
+            <div className="blur-orb blur-orb-pink" style={{ width: 200, height: 200, top: -30, right: -30, opacity: 0.2 }} />
+            <div className="relative z-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                Sẵn sàng để AI <span className="gradient-text-warm">hiểu bạn hơn</span>?
+              </h2>
+              <p className="text-fg-muted mb-8">Miễn phí. Không cần thẻ tín dụng. Chỉ cần 1 ý tưởng.</p>
+              <Link href="/new" className="btn-primary text-lg px-12 py-4">
+                ✨ Bắt Đầu Ngay
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="text-center pb-10">
+        <div className="divider mb-8" />
+        <p className="text-xs text-fg-dim">
+          Built with ❤️ in Vietnam · © 2026 TKnown
+        </p>
+      </footer>
     </main>
   );
 }

@@ -6,10 +6,10 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 const TYPES = [
-  { id: "code", label: "💻 Code App", desc: "Xây dựng web, app, tính năng mới" },
-  { id: "content", label: "✍️ Viết Content", desc: "Bài blog, email, social media" },
-  { id: "design", label: "🎨 Thiết Kế UI", desc: "Giao diện, landing page, component" },
-  { id: "business", label: "📊 Phân Tích KD", desc: "Chiến lược, phân tích thị trường" },
+  { id: "code", emoji: "💻", label: "Code App", desc: "Web, app, tính năng mới" },
+  { id: "content", emoji: "✍️", label: "Viết Content", desc: "Blog, email, social" },
+  { id: "design", emoji: "🎨", label: "Thiết Kế UI", desc: "Giao diện, landing page" },
+  { id: "business", emoji: "📊", label: "Chiến Lược KD", desc: "Phân tích, kế hoạch" },
 ];
 
 type Step = "input" | "interview" | "complete";
@@ -18,36 +18,25 @@ export default function NewBriefPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // Form state
   const [step, setStep] = useState<Step>("input");
   const [type, setType] = useState("code");
   const [rawInput, setRawInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Interview state
   const [briefId, setBriefId] = useState("");
   const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [round, setRound] = useState(1);
 
-  // Result state
   const [finalBrief, setFinalBrief] = useState("");
   const [briefTitle, setBriefTitle] = useState("");
 
-  // Auth guard
-  if (status === "unauthenticated") {
-    router.push("/login");
-    return null;
-  }
+  if (status === "unauthenticated") { router.push("/login"); return null; }
   if (status === "loading") return null;
 
-  // ============ STEP 1: Nhập thông tin ============
-  async function handleStartInterview() {
-    if (!rawInput.trim()) {
-      toast.error("Vui lòng mô tả ý tưởng của bạn");
-      return;
-    }
-
+  // Step 1 → Start interview
+  async function handleStart() {
+    if (!rawInput.trim()) { toast.error("Vui lòng mô tả ý tưởng"); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/brief", {
@@ -55,43 +44,30 @@ export default function NewBriefPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type, rawInput: rawInput.trim() }),
       });
-
       if (!res.ok) throw new Error(await res.text());
-
       const data = await res.json();
       setBriefId(data.id);
       setQuestions(data.questions);
       setAnswers({});
       setRound(1);
       setStep("interview");
-    } catch (err: any) {
-      toast.error(err.message || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: any) { toast.error(err.message); }
+    finally { setLoading(false); }
   }
 
-  // ============ STEP 2: Trả lời câu hỏi ============
+  // Step 2 → Submit answers
   async function handleSubmitAnswers() {
-    const currentAnswers = questions.map((_, i) => answers[i] || "");
-
-    if (currentAnswers.some((a) => !a.trim())) {
-      toast.error("Vui lòng trả lời tất cả câu hỏi");
-      return;
-    }
-
+    const current = questions.map((_, i) => answers[i] || "");
+    if (current.some((a) => !a.trim())) { toast.error("Trả lời tất cả câu hỏi nhé"); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/brief", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ briefId, answers: currentAnswers }),
+        body: JSON.stringify({ briefId, answers: current }),
       });
-
       if (!res.ok) throw new Error(await res.text());
-
       const data = await res.json();
-
       if (data.status === "completed") {
         setFinalBrief(data.brief);
         setBriefTitle(data.title);
@@ -100,88 +76,82 @@ export default function NewBriefPage() {
         setQuestions(data.questions);
         setAnswers({});
         setRound(data.round);
-        toast.success(`Vòng ${data.round} — ${data.questions.length} câu hỏi mới`);
+        toast.success(`Vòng ${data.round} — thêm ${data.questions.length} câu hỏi`);
       }
-    } catch (err: any) {
-      toast.error(err.message || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: any) { toast.error(err.message); }
+    finally { setLoading(false); }
   }
 
-  // ============ STEP 3: Copy brief ============
-  function handleCopyBrief() {
+  function handleCopy() {
     navigator.clipboard.writeText(finalBrief);
-    toast.success("Đã copy brief vào clipboard!");
+    toast.success("Đã copy brief!");
   }
 
-  // ============ UI ============
+  function reset() {
+    setStep("input"); setRawInput(""); setFinalBrief(""); setBriefTitle("");
+  }
+
+  // Step indicator
+  const steps = ["Ý tưởng", "Phỏng vấn", "Hoàn thành"];
+  const currentStepIdx = step === "input" ? 0 : step === "interview" ? 1 : 2;
+
   return (
-    <main className="min-h-screen flex flex-col items-center px-6 py-12">
+    <main className="min-h-screen flex flex-col items-center px-6 py-10">
       <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold mb-2">
-            {step === "input" && "Tạo Brief Mới"}
-            {step === "interview" && `Phỏng vấn — Vòng ${round}`}
-            {step === "complete" && "✅ Brief Hoàn Thành"}
-          </h1>
-          <p className="text-muted">
-            {step === "input" && "Mô tả ý tưởng của bạn, AI sẽ giúp làm rõ"}
-            {step === "interview" && "Trả lời các câu hỏi bên dưới để AI hiểu rõ hơn"}
-            {step === "complete" && briefTitle}
-          </p>
+        {/* Step indicator */}
+        <div className="flex items-center justify-center gap-3 mb-12">
+          {steps.map((s, i) => (
+            <div key={s} className="flex items-center gap-3">
+              <div className={`flex items-center gap-2 ${i <= currentStepIdx ? "text-fg" : "text-fg-dim"}`}>
+                <div className={`step-dot ${i < currentStepIdx ? "done" : ""} ${i === currentStepIdx ? "active" : ""}`} />
+                <span className="text-sm font-medium">{s}</span>
+              </div>
+              {i < 2 && <div className={`w-8 h-px ${i < currentStepIdx ? "bg-accent-2" : "bg-border"}`} />}
+            </div>
+          ))}
         </div>
 
         {/* STEP 1: Input */}
         {step === "input" && (
-          <div className="space-y-6">
-            {/* Type selector */}
-            <div>
-              <label className="text-sm font-medium text-muted mb-3 block">Bạn muốn làm gì?</label>
-              <div className="grid grid-cols-2 gap-3">
-                {TYPES.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => setType(t.id)}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      type === t.id
-                        ? "border-primary bg-primary/10 shadow-lg shadow-indigo-500/10"
-                        : "border-card-border hover:border-primary/30"
-                    }`}
-                  >
-                    <div className="font-medium mb-1">{t.label}</div>
-                    <div className="text-xs text-muted">{t.desc}</div>
-                  </button>
-                ))}
-              </div>
+          <div className="animate-fade-in space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold mb-2">Bạn muốn làm gì?</h2>
+              <p className="text-fg-muted">Chọn lĩnh vực và mô tả ý tưởng — đơn giản thôi</p>
             </div>
 
-            {/* Raw input */}
+            {/* Type selector */}
+            <div className="grid grid-cols-2 gap-3">
+              {TYPES.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setType(t.id)}
+                  className={`p-5 rounded-xl border text-left transition-all ${
+                    type === t.id
+                      ? "border-violet-500/40 bg-violet-500/5 shadow-glow"
+                      : "border-border hover:border-border-hover"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">{t.emoji}</div>
+                  <div className="font-semibold text-fg mb-0.5">{t.label}</div>
+                  <div className="text-xs text-fg-muted">{t.desc}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* Input */}
             <div>
-              <label className="text-sm font-medium text-muted mb-3 block">
-                Mô tả ý tưởng của bạn (1-3 câu)
-              </label>
               <textarea
                 value={rawInput}
                 onChange={(e) => setRawInput(e.target.value)}
-                placeholder='Ví dụ: "Tôi muốn thêm chức năng đăng nhập cho web bán hàng..."'
+                placeholder='Ví dụ: "Tôi muốn thêm đăng nhập Google cho web bán hàng bằng Next.js..."'
                 rows={4}
-                className="w-full p-4 rounded-xl bg-card border border-card-border focus:border-primary focus:outline-none resize-none text-sm placeholder:text-muted/50"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                    handleStartInterview();
-                  }
-                }}
+                className="input-warm resize-none"
+                onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleStart(); }}
               />
-              <p className="text-xs text-muted/50 mt-2">Ctrl+Enter để bắt đầu</p>
+              <p className="text-xs text-fg-dim mt-2">Ctrl+Enter để bắt đầu nhanh</p>
             </div>
 
-            <button
-              onClick={handleStartInterview}
-              disabled={loading || !rawInput.trim()}
-              className="w-full py-3.5 rounded-xl font-semibold gradient-bg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/25"
-            >
+            <button onClick={handleStart} disabled={loading || !rawInput.trim()} className="btn-primary w-full py-3.5 text-base">
               {loading ? "⏳ Đang chuẩn bị câu hỏi..." : "🎯 Bắt Đầu Phỏng Vấn"}
             </button>
           </div>
@@ -189,73 +159,57 @@ export default function NewBriefPage() {
 
         {/* STEP 2: Interview */}
         {step === "interview" && (
-          <div className="space-y-6">
-            {/* Questions */}
+          <div className="animate-fade-in space-y-6">
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-bold mb-1">Vòng {round}/2</h2>
+              <p className="text-fg-muted">Trả lời các câu hỏi để AI hiểu rõ yêu cầu của bạn</p>
+            </div>
+
             {questions.map((q, i) => (
-              <div key={i} className="glass-card p-5">
-                <label className="font-medium mb-3 block">
-                  <span className="text-primary mr-2">Q{i + 1}.</span>
-                  {q}
+              <div key={i} className="glow-card p-6">
+                <label className="flex items-start gap-3">
+                  <span className="text-violet-400 font-bold text-lg mt-0.5 shrink-0">Q{i + 1}.</span>
+                  <span className="font-medium text-fg leading-relaxed">{q}</span>
                 </label>
                 <textarea
                   value={answers[i] || ""}
                   onChange={(e) => setAnswers({ ...answers, [i]: e.target.value })}
-                  placeholder="Nhập câu trả lời của bạn..."
+                  placeholder="Nhập câu trả lời..."
                   rows={3}
-                  className="w-full p-3 rounded-lg bg-black/20 border border-card-border focus:border-primary focus:outline-none resize-none text-sm placeholder:text-muted/50"
+                  className="input-warm mt-4 resize-none"
                 />
               </div>
             ))}
 
-            <button
-              onClick={handleSubmitAnswers}
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl font-semibold gradient-bg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
-            >
-              {loading ? "⏳ Đang xử lý..." : "📤 Gửi Câu Trả Lời"}
+            <button onClick={handleSubmitAnswers} disabled={loading} className="btn-primary w-full py-3.5 text-base">
+              {loading ? "⏳ Đang xử lý..." : round === 1 ? "📤 Gửi & Tiếp Tục" : "✨ Tạo Brief Hoàn Chỉnh"}
             </button>
-
-            <p className="text-xs text-muted/50 text-center">
-              Vòng {round} · Sau 2 vòng AI sẽ tạo brief hoàn chỉnh
-            </p>
           </div>
         )}
 
         {/* STEP 3: Complete */}
         {step === "complete" && (
-          <div className="space-y-6">
-            {/* Brief output */}
+          <div className="animate-fade-in space-y-6">
+            <div className="text-center mb-2">
+              <div className="text-5xl mb-4">✅</div>
+              <h2 className="text-2xl font-bold mb-1">{briefTitle || "Brief hoàn thành!"}</h2>
+              <p className="text-fg-muted">Copy brief này và paste vào Cursor, ChatGPT, Claude...</p>
+            </div>
+
             <div className="glass-card p-6 overflow-x-auto">
-              <div
-                className="prose prose-invert prose-sm max-w-none [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base"
-                dangerouslySetInnerHTML={{ __html: finalBrief.replace(/\n/g, "<br/>") }}
-              />
+              <pre className="text-sm text-fg-muted whitespace-pre-wrap font-sans leading-relaxed">{finalBrief}</pre>
             </div>
 
             <div className="flex gap-3">
-              <button
-                onClick={handleCopyBrief}
-                className="flex-1 py-3 rounded-xl font-semibold bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-colors"
-              >
+              <button onClick={handleCopy} className="flex-1 py-3 rounded-xl font-semibold bg-violet-500/15 border border-violet-500/25 text-violet-300 hover:bg-violet-500/20 transition-all">
                 📋 Copy Brief
               </button>
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="flex-1 py-3 rounded-xl font-semibold border border-card-border hover:bg-card/50 transition-colors"
-              >
-                ← Về Dashboard
+              <button onClick={() => router.push("/dashboard")} className="btn-secondary flex-1 py-3">
+                ← Dashboard
               </button>
             </div>
 
-            <button
-              onClick={() => {
-                setStep("input");
-                setRawInput("");
-                setFinalBrief("");
-                setBriefTitle("");
-              }}
-              className="w-full py-3 rounded-xl font-semibold gradient-bg text-white hover:opacity-90 transition-opacity"
-            >
+            <button onClick={reset} className="btn-primary w-full py-3.5 text-base">
               ✨ Tạo Brief Mới
             </button>
           </div>
