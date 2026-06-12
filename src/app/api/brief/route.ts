@@ -20,6 +20,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Thiếu type hoặc rawInput" }, { status: 400 });
   }
 
+  // Đảm bảo user tồn tại trong DB (JWT strategy không tự tạo)
+  await prisma.user.upsert({
+    where: { email: session.user.email! },
+    update: { name: session.user.name, image: session.user.image },
+    create: {
+      id: session.user.id,
+      email: session.user.email!,
+      name: session.user.name,
+      image: session.user.image,
+    },
+  });
+
   // Tạo brief trong DB
   const brief = await prisma.brief.create({
     data: {
