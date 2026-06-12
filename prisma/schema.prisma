@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+  briefs    Brief[]
+}
+
+model Brief {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  type       String   // "code" | "content" | "design" | "business"
+  title      String   // Tóm tắt 1 dòng
+  rawInput   String   // Mô tả ban đầu của user
+  status     String   @default("draft") // "draft" | "interviewing" | "completed"
+  questions  String   @default("[]") // JSON array các câu hỏi AI đã hỏi
+  answers    String   @default("[]") // JSON array câu trả lời của user
+  finalBrief String   @default("") // Brief hoàn chỉnh
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
