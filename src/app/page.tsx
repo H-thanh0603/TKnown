@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const USE_CASES = [
-  { emoji: "💻", title: "Code App", desc: "Mô tả ý tưởng → AI hỏi ngược → spec hoàn chỉnh cho Cursor" },
-  { emoji: "✍️", title: "Viết Content", desc: "Từ email, blog đến social — AI giúp bạn viết đúng ý ngay lần đầu" },
-  { emoji: "🎨", title: "Thiết Kế UI", desc: "Làm rõ phong cách, layout, mood trước khi vào Figma hay AI design" },
-  { emoji: "📊", title: "Chiến Lược KD", desc: "AI chất vấn kế hoạch của bạn như 1 cố vấn, giúp bạn nhìn ra góc khuất" },
-  { emoji: "📧", title: "Soạn Email", desc: "Không còn email lan man — AI hỏi đúng trọng tâm, bạn trả lời, email tự viết" },
-  { emoji: "📝", title: "Viết Tài Liệu", desc: "Từ README, proposal đến hướng dẫn — mọi thứ rõ ràng từ câu hỏi đầu tiên" },
+  { emoji: "💻", title: "Code App", desc: "Mô tả ý tưởng → AI hỏi ngược → spec hoàn chỉnh cho Cursor", slug: "code" },
+  { emoji: "✍️", title: "Viết Content", desc: "Từ email, blog đến social — AI giúp bạn viết đúng ý ngay lần đầu", slug: "content" },
+  { emoji: "🎨", title: "Thiết Kế UI", desc: "Làm rõ phong cách, layout, mood trước khi vào Figma hay AI design", slug: "design" },
+  { emoji: "📊", title: "Chiến Lược KD", desc: "AI chất vấn kế hoạch của bạn như 1 cố vấn, giúp bạn nhìn ra góc khuất", slug: "business" },
+  { emoji: "📧", title: "Soạn Email", desc: "Không còn email lan man — AI hỏi đúng trọng tâm, bạn trả lời, email tự viết", slug: "content" },
+  { emoji: "📝", title: "Viết Tài Liệu", desc: "Từ README, proposal đến hướng dẫn — mọi thứ rõ ràng từ câu hỏi đầu tiên", slug: "content" },
 ];
 
 const STEPS = [
@@ -89,13 +89,17 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {USE_CASES.map((uc) => (
-              <div key={uc.title} className="glass-card p-6 group cursor-default">
+              <Link
+                key={uc.title}
+                href={`/new?type=${uc.slug}`}
+                className="glass-card p-6 group cursor-pointer block hover:border-violet-500/30 transition-all"
+              >
                 <div className="text-2xl mb-3">{uc.emoji}</div>
                 <h3 className="font-semibold text-fg mb-1.5 group-hover:text-violet-400 transition-colors">
                   {uc.title}
                 </h3>
                 <p className="text-sm text-fg-muted leading-relaxed">{uc.desc}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -16,9 +16,12 @@ export default async function DashboardPage() {
         </Link>
 
         <nav className="flex flex-col gap-1 flex-1">
-          <NavItem active icon="📋" label="Brief của tôi" />
-          <NavItem icon="⭐" label="Đã lưu" />
-          <NavItem icon="⚙️" label="Cài đặt" />
+          <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium bg-white/5 text-fg">
+            <span className="text-base">📋</span> Brief của tôi
+          </Link>
+          <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-fg-muted hover:text-fg hover:bg-white/[0.03] transition-all">
+            <span className="text-base">⚙️</span> Cài đặt
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3 pt-4 border-t border-border">
@@ -79,20 +82,5 @@ export default async function DashboardPage() {
         </div>
       </div>
     </main>
-  );
-}
-
-function NavItem({ icon, label, active }: { icon: string; label: string; active?: boolean }) {
-  return (
-    <button
-      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-        active
-          ? "bg-white/5 text-fg"
-          : "text-fg-muted hover:text-fg hover:bg-white/[0.03]"
-      }`}
-    >
-      <span className="text-base">{icon}</span>
-      {label}
-    </button>
   );
 }
